@@ -1,9 +1,0 @@
-{
-  "version": 2,
-  "rewrites": [
-    {
-      "source": "/some-path",
-      "destination": "/Part 3/index.html"
-    }
-  ]
-}
