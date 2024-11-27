@@ -145,13 +145,22 @@ function createTreemap(data, fullData) {
             .attr("y", centerY - 20) // Slightly above the pie chart
             .attr("dominant-baseline", "middle") // Center vertically
             .attr("text-anchor", "middle") // Center horizontally
-            .text(`${percentage}%`)
             .style("font-size", "32px") // Adjust size as needed
             .style("fill", "#fff")
             .style("opacity", 0) // Start with opacity 0 for fade-in effect
     
         // Animate the percentage text
         percentageText.transition()
+        .text("0.00%") // Initial text value
+            .transition()
+            .duration(1000)
+            .tween("text", function() {
+                const that = d3.select(this);
+                const i = d3.interpolateNumber(0, percentage);
+                return function(t) {
+                    that.text(`${i(t).toFixed(2)}%`);
+                };
+            })
             .duration(1000) // Duration of the fade-in
             .style("opacity", 1) // Fade in by changing opacity to 1
             .style("font-size", "48px"); // Optional: Scale the font size up
@@ -184,6 +193,12 @@ function createTreemap(data, fullData) {
             .style("opacity", 0) // Start with opacity 0 for fade-in effect
             .transition()
             .duration(1000) // Duration for the pie chart animation
+            .attrTween("d", function(d) {
+                const interpolateArc = d3.interpolate({startAngle: 0, endAngle: 0}, d);
+                return function(t) {
+                    return arc(interpolateArc(t));
+                };
+            })
             .style("opacity", 1); // Fade-in effect
     
         // Optional: Add a white stroke to the hollow effect
@@ -352,8 +367,6 @@ function showTimeDistribution(severityType, fullData) {
     const config = { 
         displayModeBar: false,
     };
-
-    
 
     // Initially hide the subvisualization container with a fade-out effect
     const container = d3.select("#subvisualization")
