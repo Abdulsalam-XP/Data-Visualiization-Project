@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Treemap with Subvisualizations</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div id="treemap-container">
+        <div id="treemap"></div>
+        <div id="subvisualization">
+            <!-- Add bar-chart container here -->
+            <div id="bar-chart"></div> <!-- This is the missing element for Plotly to render the bar chart -->
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
