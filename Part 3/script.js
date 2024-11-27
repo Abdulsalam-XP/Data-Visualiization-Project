@@ -137,6 +137,51 @@ function createTreemap(data, fullData) {
         // Calculate the center of the treemap (SVG canvas)
         const centerX = width / 2;
         const centerY = height / 2;
+
+        const defs = d3.select("#treemap svg").append("defs");
+    const filter = defs.append("filter")
+        .attr("id", "drop-shadow")
+        .attr("height", "130%"); // Increase height to accommodate shadow
+
+    filter.append("feGaussianBlur")
+        .attr("in", "SourceAlpha")
+        .attr("stdDeviation", 2) // Adjust blur amount
+        .attr("result", "blur");
+
+    filter.append("feOffset")
+        .attr("in", "blur")
+        .attr("dx", 5) // Adjust horizontal offset
+        .attr("dy", 2) // Adjust vertical offset
+        .attr("result", "offsetBlur");
+
+    const feMerge = filter.append("feMerge");
+    feMerge.append("feMergeNode")
+        .attr("in", "offsetBlur");
+    feMerge.append("feMergeNode")
+        .attr("in", "SourceGraphic");
+
+        const countText = d3.select("#treemap svg").append("text")
+        .attr("class", "count-text")
+        .attr("x", centerX)
+        .attr("y", centerY - 200) // Position above the percentage text
+        .attr("dominant-baseline", "middle")
+        .attr("text-anchor", "middle")
+        .style("font-size", "100px") // Slightly smaller than percentage text
+        .style("fill", "#fff")
+        .style("filter", "url(#drop-shadow)")
+        .style("opacity", 0) // Start with opacity 0
+        .transition()
+        .delay(250)
+        .duration(1000)
+        .text("0") // Display the full count
+        .tween("text", function() {
+            const that = d3.select(this);
+            const i = d3.interpolateNumber(0, d.value); // Interpolate from 0 to the count
+            return function(t) {
+                that.text(Math.round(i(t))); // Round to the nearest integer during transition
+            };
+        })
+        .style("opacity", 1); // Fade in
     
         // Add the percentage text to the center of the entire treemap
         const percentageText = d3.select("#treemap svg").append("text")
@@ -147,6 +192,7 @@ function createTreemap(data, fullData) {
             .attr("text-anchor", "middle") // Center horizontally
             .style("font-size", "32px") // Adjust size as needed
             .style("fill", "#fff")
+            .style("filter", "url(#drop-shadow)")
             .style("opacity", 0) // Start with opacity 0 for fade-in effect
     
         // Animate the percentage text
@@ -240,7 +286,13 @@ function createTreemap(data, fullData) {
             .duration(500)
             .style("opacity", 0) // Fade-out effect for the pie chart arcs
             .remove(); // Remove the pie chart after fade-out
-    
+        
+        d3.selectAll(".count-text")
+            .transition()
+            .duration(500)
+            .style("opacity", 0)
+            .remove();    
+        
         d3.select("#subvisualization").html("");
         d3.select("#subvisualization").classed("visible", false);
         
